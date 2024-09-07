@@ -1,0 +1,8 @@
+node_modules/
+build/
+files/
+.env
+.DS_Store
+*.sql
+.vscode
+*.heapsnapshot
