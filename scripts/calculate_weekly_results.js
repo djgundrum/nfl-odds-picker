@@ -1,4 +1,5 @@
-require('dotenv').config({ path: '../.env' });
+require('../helpers/script_helpers');
+
 const logger = require('../helpers/logging');
 const _ = require('lodash');
 const moment = require('moment');
@@ -8,21 +9,20 @@ const fileHelpers = require('../helpers/file_helpers');
 
 const TESTING = false;
 
-/**
- * The point of this script is
- */
 const main = async () => {
   const weekDates = await promptForDate();
 
   logger.section('Fetching NFL game odds...');
-  const gameOdds = TESTING ? fileHelpers.getH2HGameOdds() : await oddsHelpers.fetchNFLGameOdds(weekDates.startDate, weekDates.endDate);
-  if (!gameOdds?.length) {
+  const gameOdds = TESTING
+    ? { data: fileHelpers.getH2HGameOdds(), quotaInfo: 'Testing' }
+    : await oddsHelpers.fetchNFLGameOdds(weekDates.startDate, weekDates.endDate);
+  if (!gameOdds?.data?.length) {
     logger.error(`No game odds could be found for the NFL between ${weekDates.startDateFormatted} and ${weekDates.endDateFormatted}`);
     process.exit();
   }
 
   logger.section('Calculating weekly results...');
-  const gameData = gameOdds.map(calculateGamePercentages);
+  const gameData = gameOdds.data.map(calculateGamePercentages);
   const rankedGameData = _.orderBy(gameData, ['difference'], ['desc']);
 
   logger.section('Ranked Games');
@@ -44,6 +44,9 @@ const main = async () => {
 
   // make a recording of the results in a file
   fileHelpers.saveFile('weekly_results', rankedGameData);
+
+  logger.section('Quota Info');
+  console.table(gameOdds.quotaInfo);
   process.exit();
 };
 

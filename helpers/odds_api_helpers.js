@@ -17,16 +17,18 @@ const fetchAllSports = async () => {
 
   try {
     const response = await axios.get(url);
+    const quotaInfo = getQuotaInfo(response);
 
     logger.success(`Fetched all sports`);
     logger.info(`Number of sports: ${response.data.length}`);
-    return response.data;
+
+    return { data: response.data, quotaInfo };
   } catch (e) {
     logger.error(`Error fetching all sports`);
     TESTING && console.info(e);
   }
 
-  return [];
+  return { data: [], quotaInfo: { quotaRemaining: -1, quotaUsed: -1 } };
 };
 
 /**
@@ -46,16 +48,25 @@ const fetchNFLGameOdds = async (startDate, endDate) => {
 
   try {
     const response = await axios.get(url);
+    const quotaInfo = getQuotaInfo(response);
 
     logger.success(`Fetched NFL Game Odds`);
     logger.info(`Number of games: ${response.data.length}`);
-    return response.data;
+
+    return { data: response.data, quotaInfo };
   } catch (e) {
     logger.error(`Error fetching NFL Game Odds`);
     TESTING && console.info(e);
   }
 
-  return [];
+  return { data: [], quotaInfo: { quotaRemaining: -1, quotaUsed: -1 } };
+};
+
+const getQuotaInfo = (response) => {
+  const quotaRemaining = response.headers['x-requests-remaining'];
+  const quotaUsed = response.headers['x-requests-used'];
+
+  return { quotaRemaining, quotaUsed };
 };
 
 module.exports = {
