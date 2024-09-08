@@ -34,7 +34,7 @@ const main = async () => {
     const teamFavored = home_team_percentage > away_team_percentage ? home_team : away_team;
 
     let message;
-    if (game.difference > 5)
+    if (game.difference > 10)
       message = `The ${teamFavored} are favored to win by ${difference}% (${home_team_percentage}% vs ${away_team_percentage}%)`;
     else message = 'This game does not have a significant enough difference to make a prediction';
 
