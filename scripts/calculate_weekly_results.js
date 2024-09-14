@@ -10,6 +10,7 @@ const fileHelpers = require('../helpers/file_helpers');
 const TESTING = false;
 
 const main = async () => {
+  validateApiKey();
   const weekDates = await promptForDate();
 
   logger.section('Fetching NFL game odds...');
@@ -122,6 +123,14 @@ const getFormattedWeekDates = (date) => {
   const endDateFormatted = wednesdayAfterRandomThursday.format('dddd, MMMM Do');
 
   return { startDate, endDate, startDateFormatted, endDateFormatted };
+};
+
+const validateApiKey = () => {
+  if (!process.env.NFL_ODDS_API_KEY) {
+    logger.error('No NFL_ODDS_API_KEY found in your environment variables');
+    logger.info('Please add the API key to your environment or get a new one from https://the-odds-api.com');
+    process.exit();
+  }
 };
 
 module.exports = main();
